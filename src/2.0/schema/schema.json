@@ -170,7 +170,7 @@
     },
     "documentUrl": {
       "type": "string",
-      "description": "URL of the stored tt document"
+      "description": "URL of the stored document"
     },
     "issuers": {
       "type": "array",

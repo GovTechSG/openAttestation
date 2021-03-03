@@ -2,15 +2,16 @@ import { keccak256 } from "js-sha3";
 import { OpenAttestationDocument as OpenAttestationDocumentV2 } from "../../__generated__/schema.2.0";
 import { OpenAttestationDocument as OpenAttestationDocumentV3 } from "../../__generated__/schema.3.0";
 import {
-  SchemaId,
-  WrappedDocument,
   OpenAttestationDocument,
-  SignedWrappedDocument
+  SchemaId,
+  SignedWrappedDocument,
+  WrappedDocument
 } from "../../shared/@types/document";
 import { WrappedDocument as WrappedDocumentV3 } from "../../3.0/types";
-import { WrappedDocument as WrappedDocumentV2 } from "../../2.0/types";
+import { Signature, WrappedDocument as WrappedDocumentV2 } from "../../2.0/types";
 import { unsaltData } from "../../2.0/salt";
 import Ajv from "ajv";
+import { getSchema, validateSchema as validate } from "../validate";
 
 export type Hash = string | Buffer;
 type Extract<P> = P extends WrappedDocumentV2<infer T> ? T : never;
@@ -77,11 +78,11 @@ export const isWrappedV3Document = (
 ): document is WrappedDocumentV3<OpenAttestationDocumentV3> => {
   return document && document.version === SchemaId.v3;
 };
-export const isWrappedV2Document = (
-  document: WrappedDocument<OpenAttestationDocument>
-): document is WrappedDocumentV2<OpenAttestationDocumentV2> => {
-  return !isWrappedV3Document(document);
+
+export const isWrappedV2Document = (document: any): document is WrappedDocumentV2<OpenAttestationDocumentV2> => {
+  return !!(document && validate(document, getSchema(SchemaId.v2)).length === 0 && Signature.guard(document.signature));
 };
+
 export const isSignedWrappedV2Document = (
   document: any
 ): document is SignedWrappedDocument<OpenAttestationDocumentV2> => {
