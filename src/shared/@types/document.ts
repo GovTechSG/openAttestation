@@ -9,6 +9,7 @@ import {
   WrappedDocument as WrappedDocumentV3,
   SignedWrappedDocument as SignedWrappedDocumentV3
 } from "../../3.0/types";
+import { Literal, Static } from "runtypes";
 
 export type OpenAttestationDocument = OpenAttestationDocumentV2 | OpenAttestationDocumentV3;
 export type WrappedDocument<T extends OpenAttestationDocument> = T extends OpenAttestationDocumentV2
@@ -22,7 +23,6 @@ export type SignedWrappedDocument<T extends OpenAttestationDocument> = T extends
   ? SignedWrappedDocumentV3<T>
   : unknown;
 
-export type SignatureProofAlgorithm = "SHA3MerkleProof";
 export enum SignatureAlgorithm {
   OpenAttestationMerkleProofSignature2018 = "OpenAttestationMerkleProofSignature2018"
 }
@@ -36,9 +36,7 @@ export interface ObfuscationMetadata {
   obfuscatedData?: string[];
 }
 
-export enum ProofType {
-  OpenAttestationSignature2018 = "OpenAttestationSignature2018"
-}
-export enum ProofPurpose {
-  AssertionMethod = "assertionMethod"
-}
+export const ProofType = Literal("OpenAttestationSignature2018");
+export type ProofType = Static<typeof ProofType>;
+export const ProofPurpose = Literal("assertionMethod");
+export type ProofPurpose = Static<typeof ProofPurpose>;

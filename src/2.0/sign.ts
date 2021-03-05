@@ -1,9 +1,8 @@
-import { WrappedDocument } from "./types";
+import { Proof, WrappedDocument } from "./types";
 import { sign } from "../shared/signer";
 import { OpenAttestationDocument, SignedWrappedDocument } from "./types";
 import { isSignedWrappedV2Document } from "../shared/utils";
 import { SigningKey, SUPPORTED_SIGNING_ALGORITHM } from "../shared/@types/sign";
-import { ProofType, ProofPurpose } from "../shared/@types/document";
 import { ethers } from "ethers";
 
 export const signDocument = async <T extends OpenAttestationDocument>(
@@ -13,10 +12,10 @@ export const signDocument = async <T extends OpenAttestationDocument>(
 ): Promise<SignedWrappedDocument<T>> => {
   const merkleRoot = `0x${document.signature.merkleRoot}`;
   const signature = await sign(algorithm, merkleRoot, keyOrSigner);
-  const proof = {
-    type: ProofType.OpenAttestationSignature2018,
+  const proof: Proof = {
+    type: "OpenAttestationSignature2018",
     created: new Date().toISOString(),
-    proofPurpose: ProofPurpose.AssertionMethod,
+    proofPurpose: "assertionMethod",
     verificationMethod: SigningKey.guard(keyOrSigner)
       ? keyOrSigner.public
       : `did:ethr:${await keyOrSigner.getAddress()}#controller`,

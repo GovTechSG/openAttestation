@@ -16,7 +16,6 @@ import {
   OpenAttestationDocument
 } from "../../__generated__/schema.3.0";
 import { cloneDeep, omit } from "lodash";
-import { ProofPurpose } from "../../shared/@types/document";
 import sampleDid from "../schema/sample-credential-did.json";
 
 const openAttestationDataWithDid = sampleDid as OpenAttestationDocument;
@@ -281,7 +280,7 @@ describe("3.0 E2E Test Scenarios", () => {
           }
         ],
         proof: {
-          proofPurpose: ProofPurpose.AssertionMethod,
+          proofPurpose: "assertionMethod",
           salts: "",
           merkleRoot: "",
           privacy: {
@@ -299,7 +298,7 @@ describe("3.0 E2E Test Scenarios", () => {
         ...openAttestationDataWithDid,
         version: SchemaId.v3,
         proof: {
-          proofPurpose: ProofPurpose.AssertionMethod,
+          proofPurpose: "assertionMethod",
           salts: "",
           merkleRoot: "",
           privacy: {
@@ -317,7 +316,7 @@ describe("3.0 E2E Test Scenarios", () => {
         ...openAttestationDataWithDid,
         version: SchemaId.v3,
         proof: {
-          proofPurpose: ProofPurpose.AssertionMethod,
+          proofPurpose: "assertionMethod",
           salts: "",
           merkleRoot: "",
           privacy: {
@@ -343,7 +342,7 @@ describe("3.0 E2E Test Scenarios", () => {
         },
         version: SchemaId.v3,
         proof: {
-          proofPurpose: ProofPurpose.AssertionMethod,
+          proofPurpose: "assertionMethod",
           salts: "",
           merkleRoot: "",
           privacy: {

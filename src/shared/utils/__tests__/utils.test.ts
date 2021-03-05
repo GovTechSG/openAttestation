@@ -1,11 +1,9 @@
-import * as utils from "./utils";
-import { isWrappedV2Document } from "./utils";
+import * as utils from "../utils";
 // eslint-disable-next-line @typescript-eslint/camelcase
-import { __unsafe__use__it__at__your__own__risks__wrapDocument, wrapDocument } from "../../";
-import { SchemaId, WrappedDocument } from "../../shared/@types/document";
-import * as v2 from "../../__generated__/schema.2.0";
-import * as v3 from "../../__generated__/schema.3.0";
-import { omit, cloneDeep, set } from "lodash";
+import { __unsafe__use__it__at__your__own__risks__wrapDocument, wrapDocument } from "../../..";
+import { SchemaId, WrappedDocument } from "../../../shared/@types/document";
+import * as v2 from "../../../__generated__/schema.2.0";
+import * as v3 from "../../../__generated__/schema.3.0";
 
 describe("Util Functions", () => {
   let wrappedV3Document: WrappedDocument<v3.OpenAttestationDocument>;
@@ -275,70 +273,6 @@ describe("Util Functions", () => {
       expect(utils.getMerkleRoot(document)).toStrictEqual(
         "6e3b3b131db956263d142f42a840962d31359fff61c28937d9d1add0ca04c89e"
       );
-    });
-  });
-
-  describe("isWrappedV2Document", () => {
-    // tests are a bit redundant with schema.test.ts
-    test("should be valid", () => {
-      expect(isWrappedV2Document(wrappedV2Document)).toBe(true);
-    });
-    test("should be invalid when document is v3", () => {
-      expect(isWrappedV2Document(wrappedV3Document)).toBe(false);
-    });
-    test("should be not be valid when document is an empty object", () => {
-      expect(isWrappedV2Document({})).toBe(false);
-    });
-    test("should be not be valid when document is null", () => {
-      expect(isWrappedV2Document(null)).toBe(false);
-    });
-    test("should be not be valid when document.data is missing", () => {
-      expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "data"))).toBe(false);
-    });
-    test("should be not be valid when document.data is null", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "data", null))).toBe(false);
-    });
-    test("should be not be valid when document.data.issuers is missing", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "data.issuers", null))).toBe(false);
-    });
-    test("should be not be valid when document.signature is an empty object", () => {
-      expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "signature"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.type is missing", () => {
-      expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "signature.type"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.type is invalid", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "signature.type", "oops"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.targetHash is missing", () => {
-      expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "signature.targetHash"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.targetHash is invalid", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "signature.targetHash", "oops"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.merkleRoot is missing", () => {
-      expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "signature.merkleRoot"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.merkleRoot is invalid", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "signature.merkleRoot", "oops"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.proof is missing", () => {
-      expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "signature.proof"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.proof is a string", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "signature.proof", "oops"))).toBe(false);
-    });
-    test("should be not be valid when document.signature.proof is an array of number", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "signature.proof", [2]))).toBe(false);
-    });
-    test("should be not be valid when document.signature.proof is array of hash", () => {
-      expect(
-        isWrappedV2Document(
-          set(cloneDeep(wrappedV2Document), "signature.proof", [
-            "50254337f2f7dba728fc6b000bdee615c79f1657665c6a668e88b5a1721c8d82"
-          ])
-        )
-      ).toBe(true);
     });
   });
 });

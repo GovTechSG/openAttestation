@@ -2,22 +2,27 @@
 import { OpenAttestationDocument as OpenAttestationDocumentV2 } from "../__generated__/schema.2.0";
 import { ObfuscationMetadata, ProofPurpose, ProofType, SchemaId } from "../shared/@types/document";
 import { Array as RunTypesArray, Literal, Record as RunTypesRecord, Static, String } from "runtypes";
+import { ethers } from "ethers";
 
-export interface Proof {
-  type: ProofType;
-  created: string;
-  proofPurpose: ProofPurpose;
-  verificationMethod: string;
-  signature: string;
-}
+export const Proof = RunTypesRecord({
+  type: ProofType,
+  created: String,
+  proofPurpose: ProofPurpose,
+  verificationMethod: String,
+  signature: String
+});
+export type Proof = Static<typeof Proof>;
+export const ArrayProof = RunTypesArray(Proof);
+export type ArrayProof = Static<typeof ArrayProof>;
 
-const hashRegex = /^[0-9A-Fa-f]{64}$/;
-const Hash = String.withConstraint(value => hashRegex.test(value));
+const OpenAttestationHexString = String.withConstraint(
+  value => ethers.utils.isHexString(`0x${value}`, 32) || `${value} has not the expected length of 32 bytes`
+);
 export const Signature = RunTypesRecord({
   type: Literal("SHA3MerkleProof"),
-  targetHash: Hash,
-  merkleRoot: Hash,
-  proof: RunTypesArray(Hash)
+  targetHash: OpenAttestationHexString,
+  merkleRoot: OpenAttestationHexString,
+  proof: RunTypesArray(OpenAttestationHexString)
 });
 export type Signature = Static<typeof Signature>;
 
