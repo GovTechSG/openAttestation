@@ -255,8 +255,8 @@ describe("Util Functions", () => {
     });
 
     test("should return merkleroot for v3.0 document", async () => {
-      const document: WrappedDocument<any> = {
-        version: SchemaId.v3,
+      const document: WrappedDocument<v3.OpenAttestationDocument> = {
+        ...wrappedV3Document,
         proof: {
           type: "OpenAttestationMerkleProofSignature2018",
           proofPurpose: "assertionMethod",

@@ -1,17 +1,8 @@
 import { keccak256 } from "js-sha3";
 import { OpenAttestationDocument as OpenAttestationDocumentV2 } from "../../__generated__/schema.2.0";
-import { OpenAttestationDocument as OpenAttestationDocumentV3 } from "../../__generated__/schema.3.0";
-import {
-  OpenAttestationDocument,
-  SchemaId,
-  SignedWrappedDocument,
-  WrappedDocument
-} from "../../shared/@types/document";
-import { WrappedDocument as WrappedDocumentV3 } from "../../3.0/types";
-import { Signature, WrappedDocument as WrappedDocumentV2 } from "../../2.0/types";
+import { WrappedDocument as WrappedDocumentV2 } from "../../2.0/types";
 import { unsaltData } from "../../2.0/salt";
 import Ajv from "ajv";
-import { getSchema, validateSchema as validate } from "../validate";
 import { isWrappedV2Document, isWrappedV3Document } from "./guard";
 
 export type Hash = string | Buffer;

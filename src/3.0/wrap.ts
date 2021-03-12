@@ -1,6 +1,6 @@
 import { hashToBuffer, SchemaValidationError } from "../shared/utils";
 import { MerkleTree } from "../shared/merkle";
-import { SchemaId, SignatureAlgorithm } from "../shared/@types/document";
+import { SchemaId } from "../shared/@types/document";
 import { WrappedDocument } from "./types";
 import { digestCredential } from "../3.0/digest";
 import { getSchema, validateSchema as validate } from "../shared/validate";
@@ -47,7 +47,7 @@ export const wrapDocument = async <T extends OpenAttestationDocument>(
   const verifiableCredential: WrappedDocument<T> = {
     ...document,
     proof: {
-      type: SignatureAlgorithm.OpenAttestationMerkleProofSignature2018,
+      type: "OpenAttestationMerkleProofSignature2018",
       proofPurpose: "assertionMethod",
       targetHash: digest,
       proofs: merkleProof,

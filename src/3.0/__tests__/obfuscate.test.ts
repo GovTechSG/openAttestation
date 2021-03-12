@@ -1,13 +1,14 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { obfuscateVerifiableCredential } from "../obfuscate";
-import { verifySignature, __unsafe__use__it__at__your__own__risks__wrapDocument as wrapDocument } from "../..";
-import { WrappedDocument, Salt } from "../../3.0/types";
+import { __unsafe__use__it__at__your__own__risks__wrapDocument as wrapDocument, verifySignature } from "../..";
+import { Salt, WrappedDocument } from "../../3.0/types";
 import { get } from "lodash";
 import { decodeSalt } from "../salt";
 
 import { SchemaId } from "../../shared/@types/document";
-import { Method, ProofType, OpenAttestationDocument } from "../../__generated__/schema.3.0";
-import { toBuffer } from "../../shared/utils";
 import * as v3 from "../../__generated__/schema.3.0";
+import { Method, OpenAttestationDocument, ProofType } from "../../__generated__/schema.3.0";
+import { toBuffer } from "../../shared/utils";
 
 jest.mock("../../3.0/validate"); // Skipping schema verification while wrapping
 
@@ -23,7 +24,12 @@ const openAttestationData: OpenAttestationDocument = {
   type: ["VerifiableCredential", "AlumniCredential"],
   credentialSubject: {
     id: "did:example:ebfeb1f712ebc6f1c276e12ec21",
-    alumniOf: "Example University"
+    alumniOf: "Example University",
+    array: ["one", "two", "three", "four"],
+    arrayOfObject: [
+      { foo: "bar", doo: "foo" },
+      { foo: "baz", doo: "faz" }
+    ]
   },
   issuer: "https://example.edu/issuers/14",
   openAttestationMetadata: {
@@ -54,6 +60,7 @@ const openAttestationData: OpenAttestationDocument = {
 const testData = {
   key1: "value1",
   key2: "value2",
+  keyObject: { foo: "bar", bar: "dod" },
   ...openAttestationData
 };
 
@@ -96,8 +103,8 @@ describe("privacy", () => {
       expect(obfuscatedDocument.proof.privacy.obfuscated).toHaveLength(1);
     });
     test("removes one object from the root object", async () => {
-      const field = "credentialSubject";
-      const expectedFieldsToBeRemoved = ["credentialSubject.id", "credentialSubject.alumniOf"];
+      const field = "keyObject";
+      const expectedFieldsToBeRemoved = ["keyObject.foo", "keyObject.bar"];
       const newDocument = await wrapDocument(testData, { version: SchemaId.v3 });
       const obfuscatedDocument = await obfuscateVerifiableCredential(newDocument, field);
 
@@ -110,7 +117,7 @@ describe("privacy", () => {
       expect(obfuscatedDocument.proof.privacy.obfuscated).toHaveLength(2);
     });
     test("removes one key of an object from an array", async () => {
-      const field = "attachments[0].mimeType";
+      const field = "credentialSubject.arrayOfObject[0].foo";
       const newDocument = await wrapDocument(testData, { version: SchemaId.v3 });
       const obfuscatedDocument = await obfuscateVerifiableCredential(newDocument, field);
 
@@ -124,13 +131,17 @@ describe("privacy", () => {
         toBuffer({ [field]: `${salt?.value}:${value}` }).toString("hex")
       );
       expect(findSaltByPath(obfuscatedDocument.proof.salts, field)).toBeUndefined();
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(obfuscatedDocument.attachments![0]).toStrictEqual({ data: "abcd", fileName: "aaa" });
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      expect(obfuscatedDocument.credentialSubject.arrayOfObject![0]).toStrictEqual({ doo: "foo" });
       expect(obfuscatedDocument.proof.privacy.obfuscated).toHaveLength(1);
     });
     test("removes one object from an array", async () => {
-      const field = "attachments[0]";
-      const expectedFieldsToBeRemoved = ["attachments[0].mimeType", "attachments[0].fileName", "attachments[0].data"];
+      const field = "credentialSubject.arrayOfObject[0]";
+      const expectedFieldsToBeRemoved = [
+        "credentialSubject.arrayOfObject[0].foo",
+        "credentialSubject.arrayOfObject[0].doo"
+      ];
       const newDocument = await wrapDocument(testData, { version: SchemaId.v3 });
       const obfuscatedDocument = await obfuscateVerifiableCredential(newDocument, field);
 
@@ -146,11 +157,13 @@ describe("privacy", () => {
         );
         expect(findSaltByPath(obfuscatedDocument.proof.salts, field)).toBeUndefined();
       });
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(obfuscatedDocument.attachments![0]).toBeUndefined();
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      expect(obfuscatedDocument.attachments![1]).not.toBeUndefined(); // let's make sure only the first item has been removed
-      expect(obfuscatedDocument.proof.privacy.obfuscated).toHaveLength(3);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      expect(obfuscatedDocument.credentialSubject.arrayOfObject![0]).toBeUndefined();
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      expect(obfuscatedDocument.credentialSubject.arrayOfObject![1]).not.toBeUndefined(); // let's make sure only the first item has been removed
+      expect(obfuscatedDocument.proof.privacy.obfuscated).toHaveLength(2);
     });
     test("removes an array of object", async () => {
       const field = "attachments";
@@ -195,7 +208,7 @@ describe("privacy", () => {
     });
 
     test("removes values from nested object", async () => {
-      const field = "openAttestationMetadata.proof.type";
+      const field = "credentialSubject.alumniOf";
       const newDocument = await wrapDocument(openAttestationData, { version: SchemaId.v3 });
       const obfuscatedDocument = await obfuscateVerifiableCredential(newDocument, field);
       const verified = verifySignature(obfuscatedDocument);
@@ -206,7 +219,7 @@ describe("privacy", () => {
     });
 
     test("removes values from arrays", async () => {
-      const fields = ["@context[2]", "@context[3]"];
+      const fields = ["credentialSubject.array[2]", "credentialSubject.array[3]"];
       const newDocument = await wrapDocument(openAttestationData, { version: SchemaId.v3 });
       const obfuscatedDocument = await obfuscateVerifiableCredential(newDocument, fields);
       const verified = verifySignature(obfuscatedDocument);
@@ -224,12 +237,12 @@ describe("privacy", () => {
       ]);
       expect(findSaltByPath(obfuscatedDocument.proof.salts, fields[0])).toBeUndefined();
       expect(findSaltByPath(obfuscatedDocument.proof.salts, fields[1])).toBeUndefined();
-      expect(obfuscatedDocument["@context"]).not.toContain(
-        "https://schemata.openattestation.com/com/openattestation/1.0/OpenAttestation.v3.json"
-      );
-      expect(obfuscatedDocument["@context"]).not.toContain(
-        "https://schemata.openattestation.com/com/openattestation/1.0/CustomContext.json"
-      );
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore not typable
+      expect(obfuscatedDocument.credentialSubject.array).not.toContain("three");
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore not typable
+      expect(obfuscatedDocument.credentialSubject.array).not.toContain("four");
     });
 
     test("is transitive", async () => {

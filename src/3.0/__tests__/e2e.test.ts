@@ -3,17 +3,16 @@ import {
   __unsafe__use__it__at__your__own__risks__wrapDocuments as wrapDocuments,
   obfuscate,
   SchemaId,
-  SignatureAlgorithm,
   validateSchema,
   verifySignature
 } from "../..";
-import { WrappedDocument } from "../../3.0/types";
+import { SignedWrappedDocument, WrappedDocument } from "../../3.0/types";
 import {
   IdentityProofType,
   Method,
+  OpenAttestationDocument,
   ProofType,
-  TemplateType,
-  OpenAttestationDocument
+  TemplateType
 } from "../../__generated__/schema.3.0";
 import { cloneDeep, omit } from "lodash";
 import sampleDid from "../schema/sample-credential-did.json";
@@ -288,7 +287,7 @@ describe("3.0 E2E Test Scenarios", () => {
           },
           proofs: [],
           targetHash: "",
-          type: SignatureAlgorithm.OpenAttestationMerkleProofSignature2018
+          type: "OpenAttestationMerkleProofSignature2018"
         }
       };
       expect(validateSchema(credential)).toStrictEqual(true);
@@ -306,13 +305,13 @@ describe("3.0 E2E Test Scenarios", () => {
           },
           proofs: [],
           targetHash: "",
-          type: SignatureAlgorithm.OpenAttestationMerkleProofSignature2018
+          type: "OpenAttestationMerkleProofSignature2018"
         }
       };
       expect(validateSchema(credential)).toStrictEqual(true);
     });
     test("should return true when signed document is valid and version is 3.0 and identityProof is DNS-DID", () => {
-      const credential: WrappedDocument = {
+      const credential: SignedWrappedDocument = {
         ...openAttestationDataWithDid,
         version: SchemaId.v3,
         proof: {
@@ -326,7 +325,7 @@ describe("3.0 E2E Test Scenarios", () => {
           targetHash: "",
           signature: "",
           key: "",
-          type: SignatureAlgorithm.OpenAttestationMerkleProofSignature2018
+          type: "OpenAttestationMerkleProofSignature2018"
         }
       };
       expect(validateSchema(credential)).toStrictEqual(true);
@@ -352,7 +351,7 @@ describe("3.0 E2E Test Scenarios", () => {
           targetHash: "",
           signature: "",
           key: "",
-          type: SignatureAlgorithm.OpenAttestationMerkleProofSignature2018
+          type: "OpenAttestationMerkleProofSignature2018"
         }
       };
       expect(validateSchema(credential)).toStrictEqual(false);
