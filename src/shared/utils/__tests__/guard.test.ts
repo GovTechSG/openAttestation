@@ -106,7 +106,7 @@ describe("guard", () => {
       expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "data", null))).toBe(false);
     });
     test("should not be valid when document.data.issuers is missing", () => {
-      expect(isWrappedV2Document(set(cloneDeep(wrappedV2Document), "data.issuers", null))).toBe(false);
+      expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "data.issuers"))).toBe(false);
     });
     test("should not be valid when document.signature is an empty object", () => {
       expect(isWrappedV2Document(omit(cloneDeep(wrappedV2Document), "signature"))).toBe(false);
@@ -216,7 +216,7 @@ describe("guard", () => {
       expect(isWrappedV3Document(null)).toBe(false);
     });
     test("should not be valid when @context is missing", () => {
-      expect(isWrappedV3Document(set(cloneDeep(wrappedV3Document), "@context", null))).toBe(false);
+      expect(isWrappedV3Document(omit(cloneDeep(wrappedV3Document), "@context"))).toBe(false);
     });
     test("should not be valid when document.proof is an empty object", () => {
       expect(isWrappedV3Document(omit(cloneDeep(wrappedV3Document), "proof"))).toBe(false);
